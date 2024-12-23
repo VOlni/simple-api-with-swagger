@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"  # Expose app.js on localhost:3000
+    environment:
+      NODE_ENV: production
+    restart: always
+
+  ngrok:
+    image: wernight/ngrok
+    container_name: ngrok
+    ports:
+      - "4040:4040"  # Expose ngrok's web interface for inspection
+    command: http http://app:3000 --hostname=noticeably-quick-mosquito.ngrok-free.app
+    environment:
+      NGROK_AUTHTOKEN: $NGROK_TOKEN  # Replace with your ngrok token
+      NGROK_REGION: eu  # Change if needed (e.g., eu, ap)
+      NGROK_PORT: app:3000  # Tunnel to the app service on port 3000
+    depends_on:
+      - app
+    restart: always
